@@ -77,6 +77,36 @@ with st.sidebar:
     st.markdown("---")
     st.text("Built with Streamlit & Scikit-learn")
 
+# --- NLTK Setup ---
+@st.cache_resource
+def setup_nltk():
+    """Download NLTK data if needed."""
+    try:
+        nltk.download('stopwords', quiet=True)
+        nltk.download('wordnet', quiet=True)
+        return True
+    except Exception as e:
+        st.error(f"NLTK setup error: {e}")
+        return False
+
+setup_nltk()
+
+lemmatizer = WordNetLemmatizer()
+stop_words = set(stopwords.words('english'))
+
+def clean_text(text):
+    """
+    Cleans text: lowercase, remove URLs/emails, keep letters only, remove stopwords, lemmatize.
+    """
+    if not text:
+        return ""
+    text = str(text).lower().strip()
+    text = re.sub(r'http\S+|www\S+|@\S+|\S+@\S+', '', text)  # Remove URLs/Emails
+    text = re.sub(r'[^a-z\s]', '', text)                     # Keep letters only
+    
+    tokens = [lemmatizer.lemmatize(word) for word in text.split() if word not in stop_words]
+    return ' '.join(tokens)
+
 # --- Model Loading & Caching ---
 @st.cache_resource
 def load_models():
@@ -96,40 +126,13 @@ def load_models():
         vectorizer = joblib.load(vectorizer_path)
         return model, vectorizer
     except Exception as e:
+        # Fallback for version mismatch or missing file
         st.error(f"Error loading models: {e}")
+        st.warning("Ensure requirements.txt has scikit-learn==1.3.2 if using the pre-trained model, or retain without version pinning if re-training.")
         return None, None
-
-# --- NLTK Setup ---
-@st.cache_resource
-def setup_nltk():
-    """Download NLTK data if needed."""
-    try:
-        nltk.download('stopwords', quiet=True)
-        nltk.download('wordnet', quiet=True)
-        return True
-    except Exception as e:
-        st.error(f"NLTK setup error: {e}")
-        return False
 
 # Load resources
 model, vectorizer = load_models()
-setup_nltk()
-
-lemmatizer = WordNetLemmatizer()
-stop_words = set(stopwords.words('english'))
-
-def clean_text(text):
-    """
-    Cleans text: lowercase, remove URLs/emails, keep letters only, remove stopwords, lemmatize.
-    """
-    if not text:
-        return ""
-    text = str(text).lower().strip()
-    text = re.sub(r'http\S+|www\S+|@\S+|\S+@\S+', '', text)  # Remove URLs/Emails
-    text = re.sub(r'[^a-z\s]', '', text)                     # Keep letters only
-    
-    tokens = [lemmatizer.lemmatize(word) for word in text.split() if word not in stop_words]
-    return ' '.join(tokens)
 
 # --- Main Interface ---
 
