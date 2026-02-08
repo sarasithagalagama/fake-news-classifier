@@ -31,7 +31,7 @@ Given a news title and/or article text, the model predicts whether it's **likely
 - ROC-AUC: **0.9932** → almost perfect discrimination  
 - Very balanced performance on both classes (F1 ~0.96 for real & fake)
 
-## ✨ Features I'm really proud of
+## ✨ Features
 
 - Clean, reproducible pipeline from raw CSV → production-ready model
 - Proper text preprocessing (stopwords, lemmatization, URL/mention removal)
