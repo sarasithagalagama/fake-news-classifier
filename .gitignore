@@ -1,0 +1,22 @@
+# Datasets
+data/*.csv
+data/archive/
+*.zip
+*.rar
+*.tar.gz
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# IDEs
+.vscode/
+.idea/

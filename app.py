@@ -157,30 +157,26 @@ if st.button("Analyze Credibility"):
                     # Vectorize
                     vectorized_text = vectorizer.transform([cleaned_text])
                     
+                    # Check if input has any known words
+                    if vectorized_text.nnz == 0:
+                        st.warning("⚠️ The input text contains no words found in the training vocabulary. The model might just be guessing based on the bias.")
+                    
                     # Predict
                     prediction = model.predict(vectorized_text)[0] # 0 (Real) or 1 (Fake)
                     proba = model.predict_proba(vectorized_text)[0] # [prob_0, prob_1]
                     
-                    label = "Fake News" if prediction == 1 else "Real News"
+                    label = "Real News" if prediction == 1 else "Fake News"
                     confidence = proba[prediction] * 100
                     
                     # Display Result
                     st.markdown("---")
                     
                     if prediction == 1:
-                        st.markdown(f"""
-                        <div class="prediction-card fake-news">
-                            <h2>🚨 Prediction: {label}</h2>
-                            <p>The model is <strong>{confidence:.2f}%</strong> confident this is fake.</p>
-                        </div>
-                        """, unsafe_allow_html=True)
+                         st.success(f"✅ **Prediction: {label}**")
+                         st.write(f"The model is **{confidence:.2f}%** confident this is real news.")
                     else:
-                        st.markdown(f"""
-                        <div class="prediction-card real-news">
-                            <h2>✅ Prediction: {label}</h2>
-                            <p>The model is <strong>{confidence:.2f}%</strong> confident this is real.</p>
-                        </div>
-                        """, unsafe_allow_html=True)
+                        st.error(f"🚨 **Prediction: {label}**")
+                        st.write(f"The model is **{confidence:.2f}%** confident this is fake news.")
                         
                     # Debug Info (Optional - Expandable)
                     with st.expander("See processed text"):
